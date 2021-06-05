@@ -3,23 +3,17 @@ name: Docker
 on:
   push:
     branches: [ main ]
-    # Publish `v1.2.3` tags as releases.
     tags: [ 'latest' ]
     pull_request_target:
       branches: [ main ]
   workflow_dispatch:
 
 env:
-  # TODO: Creates container named ACCOUNT/REPO
-  #       Append /IMAGE-NAME to create a container named ACCOUNT/REPO/IMAGE-NAME
   IMAGE_NAME: ${{ github.repository }}
 
-  # Registry. Use docker.io for DockerHub
   REGISTRY: ghcr.io
 
 jobs:
-  # Run tests.
-  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
   test:
     runs-on: ubuntu-latest
 
@@ -30,10 +24,7 @@ jobs:
         run: |
           echo "replaced"
           
-  # Push image to GitHub Packages.
-  # See also https://docs.docker.com/docker-hub/builds/
   push:
-    # Ensure test job passes before pushing image.
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
@@ -61,7 +52,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          # Don't push on pull requests
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
